@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
+using System.Threading.Tasks;
 
 namespace Fundo.Applications.WebApi
 {
@@ -10,7 +14,7 @@ namespace Fundo.Applications.WebApi
         {
             try
             {
-                CreateWebHostBuilder(args).Build().Run();
+                CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
@@ -18,14 +22,20 @@ namespace Fundo.Applications.WebApi
             }
             finally
             {
+                Log.CloseAndFlush();
                 Console.WriteLine("Application shutting down.");
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
-        {
-            return WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
-        }
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseSerilog((context, services, configuration) =>
+                {
+                    configuration.ReadFrom.Configuration(context.Configuration);
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

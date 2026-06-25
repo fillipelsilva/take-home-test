@@ -1,0 +1,38 @@
+services:
+  fundo.applications.webapi:
+    image: ${DOCKER_REGISTRY-}fundoapplicationswebapi
+    build:
+      context: .
+      dockerfile: Fundo.Applications.WebApi/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Database=Server=Fundo.Database;Initial Catalog=fundo;User ID=sa;Password=TestPassword123;TrustServerCertificate=True;
+    depends_on:
+      - fundo.database
+      - fundo.seq
+    ports:
+      - 5000:8080
+      - 5001:8081
+
+  fundo.database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: Fundo.Database
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=TestPassword123
+      - MSSQL_PID=Developer
+    volumes:
+      - ./containers/db:/var/opt/mssql/data
+    ports:
+      - 1433:1433
+
+  fundo.seq:
+    image: datalust/seq:latest
+    container_name: Fundo.Seq
+    environment:
+        - ACCEPT_EULA=Y
+        - SEQ_FIRSTRUN_ADMINPASSWORD=LoanPassword123
+    ports:
+        - 5341:5341
+        - 8081:80

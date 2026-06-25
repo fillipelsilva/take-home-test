@@ -1,83 +1,180 @@
-# **Take-Home Test: Backend-Focused Full-Stack Developer (.NET C# & Angular)**
+﻿# Loan Management System
 
-## **Objective**
-
-This take-home test evaluates your ability to develop and integrate a .NET Core (C#) backend with an Angular frontend, focusing on API design, database integration, and basic DevOps practices.
-
-## **Instructions**
-
-1.  **Fork the provided repository** before starting the implementation.
-2.  Implement the requested features in your forked repository.
-3.  Once you have completed the implementation, **send the link** to your forked repository via email for review.
-
-## **Task**
-
-You will build a simple **Loan Management System** with a **.NET Core backend (C#)** exposing RESTful APIs and a **basic Angular frontend** consuming these APIs.
+A simple loan management application built with **.NET 6** and **Angular 19** as a take-home project. The goal was to implement the requested features while keeping the solution organized, testable and easy to maintain.
 
 ---
 
-## **Requirements**
+## Features
 
-### **1. Backend (API) - .NET Core**
+### Backend
 
-* Create a **RESTful API** in .NET Core to handle **loan applications**.
-* Implement the following endpoints:
-    * `POST /loans` → Create a new loan.
-    * `GET /loans/{id}` → Retrieve loan details.
-    * `GET /loans` → List all loans.
-    * `POST /loans/{id}/payment` → Deduct from `currentBalance`.
-* Loan example (feel free to improve it):
+- Loan CRUD
+- Loan payment registration
+- JWT authentication
+- Role-based authorization
+- FluentValidation
+- Swagger documentation
+- Structured logging with Serilog and Seq
+- Unit and integration tests
 
-    ```json
-    {
-        "amount": 1500.00, // Amount requested
-        "currentBalance": 500.00, // Remaining balance
-        "applicantName": "Maria Silva", // User name
-        "status": "active" // Status can be active or paid
-    }
-    ```
+### Frontend
 
-* Use **Entity Framework Core** with **SQL Server**.
-* Create seed data to populate the loans (the frontend will consume this).
-* Write **unit/integration tests for the API** (xUnit or NUnit).
-* **Dockerize** the backend and create a **Docker Compose** file.
-* Create a README with setup instructions.
-
-### **2. Frontend - Angular (Simplified UI)**  
-
-Develop a **lightweight Angular app** to interact with the backend
-
-#### **Features:**  
-- A **table** to display a list of existing loans.  
-
-#### **Mockup:**  
-[View Mockup](https://kzmgtjqt0vx63yji8h9l.lite.vusercontent.net/)  
-(*The design doesn’t need to be an exact replica of the mockup—it serves as a reference. Aim to keep it as close as possible.*)  
+- Loan listing
+- Create, edit and delete loans
+- Register loan payments
+- Responsive UI with Angular Material
+- Automatic JWT authentication
 
 ---
 
-## **Bonus (Optional, Not Required)**
+## Architecture
 
-* **Improve error handling and logging** with structured logs.
-* Implement **authentication**.
-* Create a **GitHub Actions** pipeline for building and testing the backend.
+The backend follows a Clean Architecture approach, separating the solution into four projects:
+
+- **Domain** – Business entities and business rules.
+- **Application** – Use cases, commands, queries and validations.
+- **Infrastructure** – Database access, authentication and external services.
+- **Web API** – Controllers, middleware and application configuration.
+
+### Design Patterns
+
+The project uses a few common patterns to keep the code organized and maintainable.
+
+#### CQRS
+
+Commands are responsible for changing the application's state, while queries are responsible only for reading data. This keeps each use case focused on a single responsibility.
+
+#### MediatR
+
+MediatR is used to dispatch commands and queries to their respective handlers, keeping controllers small and moving business logic into the application layer.
+
+#### Repository Pattern
+
+Repositories abstract the data access layer so the application remains independent from Entity Framework Core and is easier to test.
+
+#### Result Pattern
+
+Business operations return success or failure results instead of using exceptions for expected validation scenarios. This makes the execution flow more explicit.
+
+#### Pipeline Behaviors
+
+Validation, request logging and exception handling are implemented through MediatR pipeline behaviors, avoiding duplicated code across handlers.
+
+#### Dependency Injection
+
+ASP.NET Core's built-in dependency injection container is used to register services, repositories and application components, keeping the layers loosely coupled.
+
+### Frontend
+
+The frontend was developed with Angular 19 using:
+
+- Standalone Components
+- Reactive Forms
+- Angular Material
+- RxJS
+- HTTP Interceptor for JWT authentication
 
 ---
 
-## **Evaluation Criteria**
+## Tech Stack
 
-✔ **Code quality** (clean architecture, modularization, best practices).
+### Backend
 
-✔ **Functionality** (the API and frontend should work as expected).
+- .NET 6
+- ASP.NET Core
+- Entity Framework Core
+- SQL Server
+- MediatR
+- FluentValidation
+- AutoMapper
+- Serilog
+- Seq
+- xUnit
 
-✔ **Security considerations** (authentication, validation, secure API handling).
+### Frontend
 
-✔ **Testing coverage** (unit tests for critical backend functions).
+- Angular 19
+- TypeScript
+- RxJS
+- Angular Material
 
-✔ **Basic DevOps implementation** (Docker for backend).
+### DevOps
+
+- Docker
+- Docker Compose
+- GitHub Actions
 
 ---
 
-## **Additional Information**
+## Running the Project
 
-Candidates are encouraged to include a `README.md` file in their repository detailing their implementation approach, any challenges they faced, features they couldn't complete, and any improvements they would make given more time. Ideally, the implementation should be completed within **two days** of starting the test.
+### Backend
+
+```bash
+cd backend/src
+docker compose up --build
+```
+
+Available services:
+
+- API: http://localhost:5000
+- Swagger: http://localhost:5000/swagger
+- Seq: http://localhost:8081
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Application:
+
+```
+http://localhost:4200
+```
+
+---
+
+## Authentication
+
+The API is protected with JWT Bearer authentication.
+
+Generate a token using:
+
+```http
+POST /auth/token
+```
+
+Use the returned token in the `Authorization` header when calling protected endpoints.
+
+---
+
+## Running Tests
+
+Execute all backend tests:
+
+```bash
+dotnet test
+```
+
+The project includes:
+
+- Unit tests for domain logic
+- Integration tests for the API
+- Authentication and authorization tests
+
+---
+
+## Future Improvements
+
+Some improvements I would consider if the project continued to evolve:
+
+- Refresh token support
+- Payment history
+- Pagination and filtering
+- Health Check endpoint
+- End-to-end tests
+- Docker support for the frontend
+- CI pipeline with code coverage reports
